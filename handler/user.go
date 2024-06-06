@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"go-crowdfunding/helper"
 	"go-crowdfunding/user"
 	"net/http"
 
@@ -21,10 +22,13 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, nil)
 	}
 
-	user, err := h.userService.RegisterUser(input)
+	newUser, err := h.userService.RegisterUser(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, nil)
 	}
 
-	c.JSON(http.StatusCreated, user)
+	formatter := user.FormatUser(newUser, "tokentokentoken")
+	response := helper.APIResponse("your account has been created", http.StatusCreated, "success", formatter)
+
+	c.JSON(http.StatusCreated, response)
 }
