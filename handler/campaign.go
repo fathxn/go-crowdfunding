@@ -3,6 +3,7 @@ package handler
 import (
 	"go-crowdfunding/campaign"
 	"go-crowdfunding/helper"
+	"go-crowdfunding/user"
 	"net/http"
 	"strconv"
 
@@ -15,6 +16,31 @@ type campaignHandler struct {
 
 func NewCampaignHandler(service campaign.Service) *campaignHandler {
 	return &campaignHandler{service: service}
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+		resposne := helper.APIResponse("failed to create campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, resposne)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.service.CreateCampaign(input)
+	if err != nil {
+		resposne := helper.APIResponse("failed to create campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, resposne)
+		return
+	}
+
+	response := helper.APIResponse("success to create campaign", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
