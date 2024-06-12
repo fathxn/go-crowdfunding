@@ -46,7 +46,8 @@ func main() {
 	// campaign routes
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
-	api.POST("/campaigns/", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 
 	router.Run("127.0.0.1:8080")
 }
