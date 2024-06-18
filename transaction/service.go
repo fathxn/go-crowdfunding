@@ -17,5 +17,6 @@ func (s *service) GetTransactionsByCampaignID(input GetCampaignTransactionsInput
 	if err != nil {
 		return transactions, err
 	}
+
 	return transactions, nil
 }

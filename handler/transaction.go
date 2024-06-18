@@ -18,20 +18,21 @@ func NewTransactionHandler(service transaction.Service) *transactionHandler {
 
 func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
 	var input transaction.GetCampaignTransactionsInput
+
 	err := c.ShouldBindUri(&input)
 	if err != nil {
-		response := helper.APIResponse("failed to get campaign's transactions", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse("failed to get campaign transactions", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	transactions, err := h.service.GetTransactionsByCampaignID(input)
 	if err != nil {
-		response := helper.APIResponse("failed to get campaign's transactions", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse("failed to get campaign transactions", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := helper.APIResponse("campaign detail", http.StatusOK, "success", transactions)
+	response := helper.APIResponse("campaign transactions", http.StatusOK, "success", transaction.FormatCampaignTransactions(transactions))
 	c.JSON(http.StatusOK, response)
 }
