@@ -3,11 +3,13 @@ package transaction
 import (
 	"errors"
 	"go-crowdfunding/campaign"
+	"go-crowdfunding/payment"
 )
 
 type service struct {
 	repository         Repository
 	campaignRepository campaign.Repository
+	paymentService     payment.Service
 }
 
 type Service interface {
@@ -16,8 +18,12 @@ type Service interface {
 	CreateTransaction(input CreateTransactionInput) (Transaction, error)
 }
 
-func NewService(repository Repository, campaignRepository campaign.Repository) Service {
-	return &service{repository: repository, campaignRepository: campaignRepository}
+func NewService(repository Repository, campaignRepository campaign.Repository, paymentService payment.Service) Service {
+	return &service{
+		repository:         repository,
+		campaignRepository: campaignRepository,
+		paymentService:     paymentService,
+	}
 }
 
 func (s *service) GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error) {
