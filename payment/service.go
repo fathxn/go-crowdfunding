@@ -18,10 +18,10 @@ func NewService() *service {
 	return &service{}
 }
 
-func GetPaymentURL(transaction Transaction, user user.User) (string, error) {
+func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
 	midclient := midtrans.NewClient()
-	midclient.ServerKey = ""
-	midclient.ClientKey = ""
+	midclient.ServerKey = "YOUR-VT-SERVER-KEY"
+	midclient.ClientKey = "YOUR-VT-CLIENT-KEY"
 	midclient.APIEnvType = midtrans.Sandbox
 
 	snapGateway := midtrans.SnapGateway{
