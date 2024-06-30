@@ -2,6 +2,7 @@ package handler
 
 import (
 	"go-crowdfunding/helper"
+	"go-crowdfunding/payment"
 	"go-crowdfunding/transaction"
 	"go-crowdfunding/user"
 	"net/http"
@@ -10,11 +11,12 @@ import (
 )
 
 type transactionHandler struct {
-	service transaction.Service
+	service        transaction.Service
+	paymentService payment.Service
 }
 
-func NewTransactionHandler(service transaction.Service) *transactionHandler {
-	return &transactionHandler{service: service}
+func NewTransactionHandler(service transaction.Service, paymentService payment.Service) *transactionHandler {
+	return &transactionHandler{service: service, paymentService: paymentService}
 }
 
 func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
@@ -76,4 +78,22 @@ func (h *transactionHandler) CreateTransaction(c *gin.Context) {
 
 	response := helper.APIResponse("success to create transaction", http.StatusOK, "success", transaction.FormatTransaction(newTransaction))
 	c.JSON(http.StatusOK, response)
+}
+func (h *transactionHandler) GetNotification(c *gin.Context) {
+	var input transaction.TransactionNotificationInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = h.paymentService.ProcessPayment(input)
+	if err != nil {
+		response := helper.APIResponse("failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	c.JSON(http.StatusOK, input)
 }
